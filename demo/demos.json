@@ -1,0 +1,17 @@
+{
+  "name": "Vaadin Grid",
+  "pages": [
+  
+  {
+    "name": "Home",
+    "url": "grid-pagination-demos",
+    "src": "grid-pagination-demos.html",
+    "meta": {
+      "title": "vaadin-grid – Pagination",
+      "description": "",
+      "image": ""
+     }
+  }
+
+  ]
+}
