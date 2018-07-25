@@ -67,18 +67,48 @@
 <!---------------------------------------------------------------->
 <!---------------------------------------------------------------->
 <!-----------------------------------1----------------------------->
-<iron-ajax auto url="test2.json"
-	  handle-as="json"
-	  last-response={{items}} >
+<iron-ajax auto url="http://drugcomb.fimm.fi/combinations"
+ headers='{Access-Control-Allow-Headers: *}'
+ handle-as="json"
+	  last-response="{{items}}" >
 </iron-ajax>
 
 
+
 <!-----------------------------------2----------------------------->
-<iron-ajax auto url="test2.json"
+
+<!--
+ <iron-ajax
+            id="ajax"
+            auto
+            url="{{_makeUrl(routeDataGig.gigId)}}"
+            handle-as="json"
+            debounce-duration="300"
+            last-response="{{response}}"
+          ></iron-ajax>
+		  
+		  
+<iron-ajax auto 
+    url="{{resolveUrl}}"
+    headers='{Access-Control-Allow-Headers: *}'
+    
+
 	  handle-as="json"
 	  on-response="handleResponse1">
 </iron-ajax>
 
+-->
+
+<!--
+<iron-ajax auto 
+    url="http://drugcomb.fimm.fi/dose"
+    headers='{Access-Control-Allow-Headers: *}'
+    params='{"id":2}'
+
+	  handle-as="json"
+	  on-response="handleResponse7">
+</iron-ajax>
+-->
 <!-----------------------------------3----------------------------->
 <iron-ajax auto url="test2.json"
 	  handle-as="json"
@@ -199,7 +229,8 @@
           </template>
 		  
 		  
-		  
+		  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 		  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 		      <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
@@ -213,10 +244,10 @@
 
 		    var results1=[];
   var results2=[];
-
+var doses=[];
 		  var sel=[];
             window.addDemoReadyListener('#grid-pagination-demos-pagination', function(document) {
-			      'use strict';
+			  'use strict';
               Polymer({
                 is: 'x-pagination',
                 _changeText: function() {
@@ -240,10 +271,11 @@
                   page: Number,
                   pages: Array
                 },
+			
         handleResponse1: function(e) {
 		results1=e.detail.response;
-		console.log("first data Scatter Plot");
-        console.log(results1[0]);
+	  console.log("Data fetching **************");
+      console.log(results1);
 
         },
 		
@@ -306,63 +338,134 @@
 			  
             });
 			
+	function getJSONP(url, success) {
+
+    var ud = '_' + +new Date,
+        script = document.createElement('script'),
+        head = document.getElementsByTagName('head')[0] 
+               || document.documentElement;
+
+    window[ud] = function(data) {
+        head.removeChild(script);
+        success && success(data);
+    };
+
+    script.src = url.replace('callback=?', 'callback=' + ud);
+    head.appendChild(script);
+
+}
+
+
+
+   function fetch(url,y){
+   jQuery.ajax({ 
+        type: 'GET',
 		
-function myFunction(x,y,z) {
+       // url: 'http://drugcomb.fimm.fi/dose/2' ,
+		
+		url: url,
+        dataType: 'json', 
+        success: function(data) { 
+		doses=data;
+	//console.log("doses");
+		   console.log("*******************************");
+	   console.log("*******************************");
+	   console.log("*******************************");
+
+console.log(data);
+        alert(data.DrugA);
+		draw(data,y);
+		
+
+		
+        }
+    });
+
+}
+
+function draw(data,y){
 
 
 
-  google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
+//alert(data[0].DoseA);
 
-	  
-
-
-      function drawChart() {
-	  
-
-  var css = ['20', '22', '23', '24', '25','26','27','28'];
-  var zip = [1, 2, 3, 4, 5,6,7,8,9,10];
-
-  var er = new google.visualization.DataTable();
-  er.addColumn('string', 'css');
-  er.addColumn('number', 'zip');
-
-  for(i = 0; i < sel.length; i++)
-    er.addRow([css[i], zip[i]]);
+//alert(data[0].DoseB);
+//alert(data[0].Response);
 
 
+console.log(data['DoseA']);
+
+var x_data=[];
+var y_data=[];
+var z_data=[];
+
+for(i=0;i<data.length;i++)
+{
+  x_data.push(data[i].DoseA);
+ y_data.push(data[i].DoseB);
+  z_data.push(data[i].Response);
+}
+
+console.log("***********************************X_DATA************************");
+console.log(x_data);
+console.log("***********************************Y_DATA************************");
+console.log(y_data);
+console.log("***********************************Z_DATA************************");
+console.log(z_data);
+
+
+var data = [{
+    type: "mesh3d",
+    x: x_data,
+    y: y_data,
+    z: z_data,
   
-	  /*
-        var er = google.visualization.arrayToDataTable([
-          ['ZIP', 'ZIP,CSS'],
-          [ 8,      12],
-          [ 4,      5.5],
-          [ 11,     14],
-          [ 4,      5],
-          [ 3,      3.5],
-          [ 6.5,    7]
-        ]);
-*/
-        var options = {
-          title: 'ZIP vs. CSS Drug comparison',
-          hAxis: {title: 'ZIP', minValue: 0, maxValue: 15},
-          vAxis: {title: 'CSS', minValue: 0, maxValue: 15},
-          legend: 'none'
-        };
+    intensity: [0, 0.33, 0.66, 1],
+    colorscale: [
+      [0, 'rgb(255, 0, 0)'],
+      [0.5, 'rgb(0, 255, 0)'],
+      [1, 'rgb(0, 0, 255)']
+    ]
+  }
+];
 
-        var chart = new google.visualization.ScatterChart(x);
-  function selectHandler() {
-    var selectedItem = chart.getSelection()[0];
-    if (selectedItem) {
-    //  var value = data.getValue(selectedItem.row, selectedItem.column);
-      //alert('The user selected ' + value);
-	  console.log(er.getValue(selectedItem.row, selectedItem.column));
-	  
-	  
-	  
-	  
-	  
-	  Plotly.d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/api_docs/mt_bruno_elevation.csv', function(err, rows){
+Plotly.plot(y, data, {});
+
+
+
+
+/*
+var data=[
+    {
+      opacity:0.8,
+      color:'rgb(300,100,200)',
+      type: 'mesh3d',
+      x: x_data,
+      y: y_data,
+      z: z_data,
+    }
+];
+Plotly.newPlot(y, data);
+
+
+*/
+
+
+
+/*
+var data_z1 = {x: x_data, type: 'surface'};
+var data_z2 = {y: y_data,  type: 'surface'};
+var data_z3 = {z: z_data,  type: 'surface'};
+
+
+
+Plotly.newPlot(y, [data_z1, data_z2, data_z3]);
+
+*/
+
+
+/*
+Plotly.d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/api_docs/mt_bruno_elevation.csv', function(err, rows){
 function unpack(rows, key) {
   return rows.map(function(row) { return row[key]; });
 }
@@ -393,6 +496,155 @@ var layout = {
 
 Plotly.newPlot(y, data, layout);
 });  
+*/
+
+
+
+}
+
+	
+function myFunction(x,y,z) {
+
+var css = [];
+var zip = [];
+console.log("*******Scatter Plot Data************");
+console.log("selected Items IDs");
+for(i=0;i<sel.length;i++)
+{
+console.log(sel[i].DSS);
+console.log(sel[i].Synergy_HSA);
+css.push(sel[i].DSS);
+zip.push(sel[i].Synergy_HSA);
+}
+
+console.log("***********************************");
+
+
+/*
+ $(document).ready(function() {
+
+   jQuery.ajax({ 
+        type: 'GET',
+        url: 'http://drugcomb.fimm.fi/dose/2' ,
+        dataType: 'json', 
+        success: function(data) { 
+		doses=data;
+	//	console.log("doses");
+//console.log(doses);
+         //   alert(data.id);
+        }
+    });})
+
+*/
+
+
+	
+//console.log("doses");
+//console.log(doses);
+
+//console.log("selected items");
+//console.log(sel);
+  google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+	  
+
+
+      function drawChart() {
+	  
+	  	console.log("doses");
+        console.log(doses);
+
+	    console.log("selected Items");
+	  console.log(sel);
+
+
+	  
+	  
+	  
+	  
+	  
+	  
+  var er = new google.visualization.DataTable();
+  er.addColumn('number', 'css');
+  er.addColumn('number', 'zip');
+
+  for(i = 0; i < sel.length; i++)
+    er.addRow([css[i], zip[i]]);
+
+
+  
+	  /*
+        var er = google.visualization.arrayToDataTable([
+          ['ZIP', 'ZIP,CSS'],
+          [ 8,      12],
+          [ 4,      5.5],
+          [ 11,     14],
+          [ 4,      5],
+          [ 3,      3.5],
+          [ 6.5,    7]
+        ]);
+*/
+        var options = {
+          title: 'ZIP vs. CSS Drug comparison',
+		  /*
+		  hAxis: {title: 'ZIP', minValue: 0, maxValue: 15},
+          vAxis: {title: 'CSS', minValue: 0, maxValue: 15},
+		  */
+		  
+		  //Max Min automatically
+          hAxis: {title: 'ZIP'},
+          vAxis: {title: 'CSS'},
+          legend: 'none'
+        };
+
+        var chart = new google.visualization.ScatterChart(x);
+  function selectHandler() {
+    var selectedItem = chart.getSelection()[0];
+    if (selectedItem) {
+    //  var value = data.getValue(selectedItem.row, selectedItem.column);
+      //alert('The user selected ' + value);
+	  console.log("graph selected item");
+	  
+	  console.log(selectedItem.row);
+	  
+	  console.log("*******************************");
+	  console.log(er.getValue(selectedItem.row, selectedItem.column));
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+
+
+
+
+
+
+
+//IDs start from 1 not zero 
+var urllink='http://drugcomb.fimm.fi/doses/'+(selectedItem.row+1);
+ console.log("********DOSES**************");
+	//  console.log(url);
+	//   console.log("*******************************");
+
+
+	/*
+getJSONP(urllink, function(data){
+console.log("dose data test");
+    console.log(JSON.decode(data));
+});
+
+*/
+
+fetch(urllink,y);
+
+
+
+
+
 
 	  
 var data = [
