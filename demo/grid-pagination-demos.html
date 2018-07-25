@@ -357,7 +357,7 @@ var doses=[];
 
 
 
-   function fetch(url,y){
+   function fetch(url,y,z){
    jQuery.ajax({ 
         type: 'GET',
 		
@@ -373,8 +373,8 @@ var doses=[];
 	   console.log("*******************************");
 
 console.log(data);
-        alert(data.DrugA);
-		draw(data,y);
+      //  alert(data.DrugA);
+		draw(data,y,z);
 		
 
 		
@@ -383,7 +383,7 @@ console.log(data);
 
 }
 
-function draw(data,y){
+function draw(data,y,z){
 
 
 
@@ -420,7 +420,7 @@ var data = [{
     y: y_data,
     z: z_data,
   
-    intensity: [0, 0.33, 0.66, 1],
+    //intensity: [0, 0.33, 0.66, 1],
     colorscale: [
       [0, 'rgb(255, 0, 0)'],
       [0.5, 'rgb(0, 255, 0)'],
@@ -432,6 +432,23 @@ var data = [{
 Plotly.plot(y, data, {});
 
 
+
+
+var data = [
+  {
+    z: z_data,
+    x: x_data,
+    y: y_data,
+    type: 'heatmap',
+	  colorscale: [
+      [0, 'rgb(255, 0, 0)'],
+      [0.5, 'rgb(0, 255, 0)'],
+      [1, 'rgb(0, 0, 255)']
+    ]
+  }
+];
+
+Plotly.newPlot(z, data);
 
 
 /*
@@ -586,15 +603,15 @@ console.log("***********************************");
         ]);
 */
         var options = {
-          title: 'ZIP vs. CSS Drug comparison',
+          title: 'DSS vs. Synergy_HSA Drug comparison',
 		  /*
 		  hAxis: {title: 'ZIP', minValue: 0, maxValue: 15},
           vAxis: {title: 'CSS', minValue: 0, maxValue: 15},
 		  */
 		  
 		  //Max Min automatically
-          hAxis: {title: 'ZIP'},
-          vAxis: {title: 'CSS'},
+          hAxis: {title: 'DSS'},
+          vAxis: {title: 'Synergy_HSA'},
           legend: 'none'
         };
 
@@ -639,51 +656,10 @@ console.log("dose data test");
 
 */
 
-fetch(urllink,y);
+fetch(urllink,y,z);
 
 
-
-
-
-
-	  
-var data = [
-  {
-    z: [[1, 20, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
-    x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-    y: ['Morning', 'Afternoon', 'Evening'],
-    type: 'heatmap'
-  }
-];
-
-Plotly.newPlot(z, data);
  
-
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
     }
   }
 
